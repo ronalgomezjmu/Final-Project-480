@@ -20,13 +20,21 @@ public class ZombieController : MonoBehaviour
     [Header("Effects")]
     [SerializeField] private GameObject dirtEffectPrefab;
     
+    [Header("Audio")]
+    [SerializeField] private AudioClip zombieSound;
+    [SerializeField] private float minTimeBetweenSounds = 3f;
+    [SerializeField] private float maxTimeBetweenSounds = 8f;
+    [SerializeField] private float zombieSoundVolume = 0.7f;
+    
     private Transform player;
     private NavMeshAgent agent;
     private Animator animator;
+    private AudioSource audioSource;
     private Vector3 startPosition;
     private float emergeTimer = 0f;
     private bool hasEmerged = false;
     private float lastStepTime = 0f;
+    private float nextSoundTime = 0f;
     
     // Animation parameter check
     private bool hasChaseParameter = false;
@@ -59,6 +67,27 @@ public class ZombieController : MonoBehaviour
         // Cache other references
         agent = GetComponent<NavMeshAgent>();
         animator = GetComponent<Animator>();
+        audioSource = GetComponent<AudioSource>();
+        
+        // Set up audio source if it doesn't exist
+        if (audioSource == null)
+        {
+            audioSource = gameObject.AddComponent<AudioSource>();
+            audioSource.spatialBlend = 1.0f; // Make sound 3D
+            audioSource.rolloffMode = AudioRolloffMode.Linear;
+            audioSource.minDistance = 1f;
+            audioSource.maxDistance = 20f;
+        }
+        
+        // Set the zombie sound clip if not assigned in inspector
+        if (zombieSound == null)
+        {
+            // Try to find the sound in the project
+            zombieSound = Resources.Load<AudioClip>("454832__misterkidx__zombie_walk_1");
+        }
+        
+        // Schedule first sound
+        nextSoundTime = Time.time + Random.Range(0.1f, 1.0f);
         
         // Check which animation parameters exist
         if (animator != null)
@@ -89,6 +118,9 @@ public class ZombieController : MonoBehaviour
         // Set animation state if you have an emerge animation
         if (animator != null && hasEmergeParameter)
             animator.SetTrigger("Emerge");
+            
+        // Play initial zombie sound
+        PlayZombieSound();
     }
     
     void Update()
@@ -104,6 +136,25 @@ public class ZombieController : MonoBehaviour
             case ZombieState.Attacking:
                 AttackPlayer();
                 break;
+        }
+        
+        // Periodically play zombie sounds
+        if (Time.time > nextSoundTime)
+        {
+            PlayZombieSound();
+            // Schedule next sound
+            nextSoundTime = Time.time + Random.Range(minTimeBetweenSounds, maxTimeBetweenSounds);
+        }
+    }
+    
+    void PlayZombieSound()
+    {
+        if (audioSource != null && zombieSound != null)
+        {
+            audioSource.clip = zombieSound;
+            audioSource.volume = zombieSoundVolume;
+            audioSource.pitch = Random.Range(0.8f, 1.2f); // Add some variety
+            audioSource.Play();
         }
     }
     
@@ -155,6 +206,9 @@ public class ZombieController : MonoBehaviour
                 if (hasSpeedParameter)
                     animator.SetFloat("Speed", moveSpeed * animationSpeedMultiplier);
             }
+            
+            // Play sound when finished emerging
+            PlayZombieSound();
         }
     }
     
@@ -216,6 +270,9 @@ public class ZombieController : MonoBehaviour
                     if (hasIsWalkingParameter)
                         animator.SetBool("IsWalking", false);
                 }
+                
+                // Play attack sound
+                PlayZombieSound();
             }
         }
     }
