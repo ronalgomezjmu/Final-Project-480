@@ -5,6 +5,8 @@ TagManager:
   serializedVersion: 3
   tags:
   - XR Origin
+  - Bullet
+  - Zombie
   layers:
   - Default
   - TransparentFX
