@@ -10,17 +10,17 @@ public class DestroyOnCollision : MonoBehaviour
     {
         if (destroyWithAnyObject || collision.gameObject.CompareTag(collisionTag))
         {
-            // Check if the object has a ZombieHealth component
-            ZombieHealth zombieHealth = collision.gameObject.GetComponent<ZombieHealth>();
+            // Look specifically for ZombieController 
+            ZombieController zombieController = collision.gameObject.GetComponent<ZombieController>();
             
-            if (zombieHealth != null)
+            if (zombieController != null)
             {
                 // Apply damage to the zombie
-                zombieHealth.TakeDamage(damageAmount);
+                zombieController.TakeDamage(damageAmount);
             }
             else
             {
-                // If not a zombie or doesn't have health, destroy it directly (old behavior)
+                // If not a zombie, destroy it directly
                 Destroy(collision.gameObject);
             }
             

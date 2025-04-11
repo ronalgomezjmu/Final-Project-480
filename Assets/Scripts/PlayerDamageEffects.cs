@@ -37,21 +37,15 @@ public class PlayerDamageEffects : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Space))
         {
             Debug.Log("Space pressed - showing blood splatter");
-            ShowBloodSplatter();
-            PlayHurtSound();
+            TakeDamage();
         }
     }
     
-    private void OnTriggerEnter(Collider other)
+    // Public method that can be called from zombies
+    public void TakeDamage()
     {
-        Debug.Log("Collision with: " + other.gameObject.name);
-        
-        if (other.CompareTag("Zombie"))
-        {
-            Debug.Log("Zombie hit detected!");
-            ShowBloodSplatter();
-            PlayHurtSound();
-        }
+        ShowBloodSplatter();
+        PlayHurtSound();
     }
     
     void ShowBloodSplatter()

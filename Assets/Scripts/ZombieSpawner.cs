@@ -155,10 +155,10 @@ public class ZombieSpawner : MonoBehaviour
         // Add this position to our active positions list
         activeSpawnPositions.Add(spawnPosition);
         
-        // ONLY CREATE ONE ZOMBIE INSTANCE
+        // Spawn the zombie at the offset position
         GameObject zombie = Instantiate(zombiePrefab, spawnPosition, Quaternion.identity);
     
-        // Make zombie face toward the center of the play area
+        // Make zombie face toward the center - [existing code remains the same]
         Vector3 centerDirection = new Vector3(0, 0, 0) - spawnPosition;
         centerDirection.y = 0; // Keep upright
         if (centerDirection != Vector3.zero)
@@ -166,19 +166,22 @@ public class ZombieSpawner : MonoBehaviour
             zombie.transform.rotation = Quaternion.LookRotation(centerDirection);
         }
     
-        // Add health component FIRST
-        ZombieHealth healthComponent = zombie.AddComponent<ZombieHealth>();
-        healthComponent.Initialize(this, currentWave);
-        
-        // Then add tracker component
+        // FIRST add the component to track when zombie is destroyed
         ZombieTracker tracker = zombie.AddComponent<ZombieTracker>();
         tracker.spawner = this;
         tracker.spawnPosition = spawnPosition;
     
-        // Increase counter AFTER everything is set up
+        // THEN set the health and pass the tracker reference
+        ZombieController controller = zombie.GetComponent<ZombieController>();
+        if (controller != null)
+        {
+            controller.SetHealth(this, currentWave);
+        }
+    
+        // Increase counter
         zombiesAlive++;
+
         
-        Debug.Log("Spawned zombie with " + (1 + currentWave) + " health in wave " + currentWave);
     }
 
     // Check if a position is too close to any existing zombies

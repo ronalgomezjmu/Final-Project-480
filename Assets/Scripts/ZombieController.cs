@@ -26,6 +26,12 @@ public class ZombieController : MonoBehaviour
     [SerializeField] private float maxTimeBetweenSounds = 8f;
     [SerializeField] private float zombieSoundVolume = 0.7f;
     
+    [Header("Player Damage")]
+    [SerializeField] private float damageRange = 1.5f;
+    [SerializeField] private float damageInterval = 1.0f;
+    private float nextDamageTime = 0f;
+    private PlayerDamageEffects playerDamageEffects;
+    
     private Transform player;
     private NavMeshAgent agent;
     private Animator animator;
@@ -46,6 +52,33 @@ public class ZombieController : MonoBehaviour
     // States
     private enum ZombieState { Emerging, Chasing, Attacking }
     private ZombieState currentState;
+
+    [Header("Health")]
+    private int maxHealth;
+    private int currentHealth;
+    private ZombieSpawner spawner;
+
+    public void SetHealth(ZombieSpawner spawnerRef, int wave)
+    {
+        spawner = spawnerRef;
+        // Health starts at 2 for wave 1, and increases by 1 for each wave
+        maxHealth = 1 + wave;
+        currentHealth = maxHealth;
+        Debug.Log("Zombie initialized with " + currentHealth + " health in wave " + wave);
+    }
+
+    public void TakeDamage(int damage)
+    {
+        currentHealth -= damage;
+        Debug.Log("Zombie took damage! Current health: " + currentHealth);
+
+        if (currentHealth <= 0)
+        {
+            Debug.Log("Zombie is defeated!");
+            
+            Destroy(gameObject);
+        }
+    }
     
     void Start()
     {
@@ -62,6 +95,32 @@ public class ZombieController : MonoBehaviour
         else
         {
             player = Camera.main.transform;
+        }
+        
+        // Find player damage effects component
+        GameObject playerObject = GameObject.FindWithTag("Player");
+        if (playerObject == null)
+        {
+            playerObject = GameObject.FindWithTag("XR Origin"); // Try alternative tag
+        }
+        
+        if (playerObject != null)
+        {
+            playerDamageEffects = playerObject.GetComponent<PlayerDamageEffects>();
+            if (playerDamageEffects == null)
+            {
+                // Try to find it in children
+                playerDamageEffects = playerObject.GetComponentInChildren<PlayerDamageEffects>();
+            }
+            
+            if (playerDamageEffects == null)
+            {
+                Debug.LogWarning("PlayerDamageEffects component not found on player!");
+            }
+            else
+            {
+                Debug.Log("Found PlayerDamageEffects component");
+            }
         }
         
         // Cache other references
@@ -291,6 +350,25 @@ public class ZombieController : MonoBehaviour
                     Quaternion.LookRotation(direction),
                     Time.deltaTime * rotationSpeed
                 );
+            }
+            
+            // NEW: Check if it's time to damage the player
+            if (Time.time >= nextDamageTime)
+            {
+                // Check if player is in range
+                float distanceToPlayer = Vector3.Distance(transform.position, player.position);
+                if (distanceToPlayer <= damageRange)
+                {
+                    // Apply damage to player
+                    if (playerDamageEffects != null)
+                    {
+                        Debug.Log("Zombie attacking player! Calling TakeDamage()");
+                        playerDamageEffects.TakeDamage();
+                    }
+                    
+                    // Set next damage time
+                    nextDamageTime = Time.time + damageInterval;
+                }
             }
         }
         

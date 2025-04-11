@@ -5275,6 +5275,10 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 305529737028920428, guid: 278151560c2e5eb2ab335137ec7d452f, type: 3}
+      propertyPath: dirtEffectPrefab
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 772522731604751846, guid: 278151560c2e5eb2ab335137ec7d452f, type: 3}
       propertyPath: m_LocalPosition.x
       value: 4.7
@@ -5315,10 +5319,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 3110637807372128446, guid: 278151560c2e5eb2ab335137ec7d452f, type: 3}
-      propertyPath: damageAmount
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 4144238858451022902, guid: 278151560c2e5eb2ab335137ec7d452f, type: 3}
       propertyPath: Spatialize
       value: 1
@@ -5353,3 +5353,4 @@ SceneRoots:
   - {fileID: 1556915735}
   - {fileID: 848918878}
   - {fileID: 1597507295}
+  - {fileID: 488955960}
