@@ -3,7 +3,7 @@ using UnityEngine.UI;
 
 public class Weapon : MonoBehaviour
 {
-    public GameObject bulletTempalte;
+    public GameObject bulletTamplate;
     public Transform firePoint;
 
     public int ammoCount = 10;
@@ -16,6 +16,9 @@ public class Weapon : MonoBehaviour
     public Slider reloadProgress;
     public float reloadTime = 2f;
     private float reloadCooldownRemaining = 0;
+
+    public bool isAutomatic = false;
+    private bool isShooting = false;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -39,6 +42,15 @@ public class Weapon : MonoBehaviour
             }
         }
 
+        if (isShooting)
+        {
+            fireBullet();
+            if (!isAutomatic)
+            {
+                isShooting = false;
+            }
+        }
+
     }
 
     private void startReload()
@@ -57,9 +69,19 @@ public class Weapon : MonoBehaviour
 
     public void shoot()
     {
+        isShooting = true;
+    }
+
+    public void stopShooting()
+    {
+        isShooting = false;
+    }
+
+    private void fireBullet()
+    {
         if (currentAmmoCount > 0 && shotCooldownRemaining <= 0)
         {
-            GameObject bullet = Instantiate(bulletTempalte, firePoint.position, firePoint.rotation);
+            GameObject bullet = Instantiate(bulletTamplate, firePoint.position, firePoint.rotation);
             Rigidbody rigidbody = bullet.GetComponent<Rigidbody>();
             rigidbody.AddForce(firePoint.up * 5000f);
             shotCooldownRemaining = timeBetweenShots;
