@@ -167,7 +167,7 @@ PlayerSettings:
   androidMinAspectRatio: 1
   applicationIdentifier:
     Android: com.SegFaults.FinalProject
-    Standalone: com.DefaultCompany.3D-Project
+    Standalone: com.SegFaults.FinalProject
   buildNumber:
     Standalone: 0
     VisionOS: 0
