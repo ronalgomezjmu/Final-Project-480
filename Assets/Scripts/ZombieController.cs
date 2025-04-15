@@ -1,5 +1,8 @@
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using System.Linq;
 
 public class ZombieController : MonoBehaviour
 {
@@ -32,6 +35,10 @@ public class ZombieController : MonoBehaviour
     private float nextDamageTime = 0f;
     private PlayerDamageEffects playerDamageEffects;
     
+    [Header("Death Settings")]
+    [SerializeField] private float deathStayTime = 5f;
+    [SerializeField] private float deathFadeTime = 2f;
+    
     private Transform player;
     private NavMeshAgent agent;
     private Animator animator;
@@ -48,27 +55,37 @@ public class ZombieController : MonoBehaviour
     private bool hasEmergeParameter = false;
     private bool hasSpeedParameter = false;
     private bool hasIsWalkingParameter = false;
+    private bool hasDeathParameter = false;
     
     // States
-    private enum ZombieState { Emerging, Chasing, Attacking }
+    private enum ZombieState { Emerging, Chasing, Attacking, Dying, Dead }
     private ZombieState currentState;
 
     [Header("Health")]
     private int maxHealth;
     private int currentHealth;
     private ZombieSpawner spawner;
+    private Vector3 spawnPosition; // Store the spawn position for reference when destroyed
+    private int waveNumber; // Store the wave number for score calculation
 
     public void SetHealth(ZombieSpawner spawnerRef, int wave)
     {
         spawner = spawnerRef;
+        waveNumber = wave; // Store the wave number for scoring
         // Health starts at 2 for wave 1, and increases by 1 for each wave
         maxHealth = 1 + wave;
         currentHealth = maxHealth;
+        // Store the spawn position
+        spawnPosition = transform.position;
         Debug.Log("Zombie initialized with " + currentHealth + " health in wave " + wave);
     }
 
     public void TakeDamage(int damage)
     {
+        // Only process damage if not already dying or dead
+        if (currentState == ZombieState.Dying || currentState == ZombieState.Dead)
+            return;
+            
         currentHealth -= damage;
         Debug.Log("Zombie took damage! Current health: " + currentHealth);
 
@@ -76,9 +93,139 @@ public class ZombieController : MonoBehaviour
         {
             Debug.Log("Zombie is defeated!");
             
-            Destroy(gameObject);
+            // Award points to the player through ScoreManager
+            if (ScoreManager.Instance != null)
+            {
+                ScoreManager.Instance.AddZombieKillPoints(waveNumber, transform.position);
+            }
+            
+            // Notify the spawner immediately that this zombie is dead
+            if (spawner != null)
+            {
+                spawner.ZombieDestroyed(spawnPosition);
+            }
+            
+            // Then trigger death sequence
+            StartCoroutine(DieWithPhysics());
         }
     }
+    
+    // New coroutine for physics-based death
+    private IEnumerator DieWithPhysics()
+    {
+        // Set state to dying
+        currentState = ZombieState.Dying;
+
+        // Disable the NavMeshAgent so it stops navigating
+        if (agent != null && agent.enabled)
+        {
+            agent.isStopped = true;
+            agent.enabled = false;
+        }
+
+        // Get or add a Rigidbody for physics
+        Rigidbody rb = GetComponent<Rigidbody>();
+        if (rb == null)
+        {
+            rb = gameObject.AddComponent<Rigidbody>();
+        }
+
+        // Make sure rigidbody is not kinematic and uses gravity
+        rb.isKinematic = false;
+        rb.useGravity = true;
+
+        // Determine forward direction so we can fall face down
+        Vector3 forwardDir = transform.forward;
+
+        // Stop any current movement
+        rb.linearVelocity = Vector3.zero;
+        rb.angularVelocity = Vector3.zero;
+
+        // Apply force to make it fall forward (face down)
+        rb.AddForce(forwardDir * 2.5f, ForceMode.Impulse);
+        // Add some downward force to make it fall faster
+        rb.AddForce(Vector3.down * 3f, ForceMode.Impulse);
+        // Add some torque to make it rotate forward (face down)
+        rb.AddTorque(-transform.right * 5f, ForceMode.Impulse);
+
+        // Play death sound
+        PlayZombieSound();
+
+        // Disable any colliders that might interfere with falling
+        Collider[] colliders = GetComponents<Collider>();
+        foreach (Collider col in colliders)
+        {
+            // Keep the main collider but make it non-trigger
+            col.isTrigger = false;
+        }
+
+        // Play death animation if available
+        if (animator != null)
+        {
+            // Check if you have a death animation parameter
+            animator.SetBool("IsWalking", false);
+
+            // If you have a "Death" parameter, use it
+            // Otherwise, you could disable the animator to let physics take over
+            if (hasDeathParameter)
+            {
+                animator.SetTrigger("Death");
+            }
+            else
+            {
+                animator.enabled = false;
+            }
+        }
+
+        // Set state to dead
+        currentState = ZombieState.Dead;
+
+        // Wait for some time to let the zombie stay visible after death
+        yield return new WaitForSeconds(deathStayTime);
+
+        // Slowly fade out
+        float elapsed = 0;
+
+        // Get all renderers
+        Renderer[] renderers = GetComponentsInChildren<Renderer>();
+
+        // Original materials and colors
+        List<Material> materials = new List<Material>();
+        List<Color> originalColors = new List<Color>();
+
+        // Store original colors
+        foreach (Renderer renderer in renderers)
+        {
+            foreach (Material mat in renderer.materials)
+            {
+                materials.Add(mat);
+                originalColors.Add(mat.color);
+            }
+        }
+
+        // Fade out loop
+        while (elapsed < deathFadeTime)
+        {
+            elapsed += Time.deltaTime;
+            float normalizedTime = elapsed / deathFadeTime;
+
+            // Fade out all materials
+            for (int i = 0; i < materials.Count; i++)
+            {
+                Color newColor = originalColors[i];
+                newColor.a = Mathf.Lerp(originalColors[i].a, 0f, normalizedTime);
+                materials[i].color = newColor;
+            }
+
+            yield return null;
+        }
+
+        // Finally destroy the gameObject
+        Destroy(gameObject);
+    }
+    
+    // Rest of the original ZombieController methods remain the same
+    // ... (Start, Update, PlayZombieSound, HandleEmerging, ChasePlayer, AttackPlayer, ReturnToChasing)
     
     void Start()
     {
@@ -158,6 +305,7 @@ public class ZombieController : MonoBehaviour
                 if (param.name == "Emerge") hasEmergeParameter = true;
                 if (param.name == "Speed") hasSpeedParameter = true;
                 if (param.name == "IsWalking") hasIsWalkingParameter = true;
+                if (param.name == "Death") hasDeathParameter = true;
             }
         }
         
@@ -184,25 +332,29 @@ public class ZombieController : MonoBehaviour
     
     void Update()
     {
-        switch (currentState)
+        // Only process AI logic if not dying or dead
+        if (currentState != ZombieState.Dying && currentState != ZombieState.Dead)
         {
-            case ZombieState.Emerging:
-                HandleEmerging();
-                break;
-            case ZombieState.Chasing:
-                ChasePlayer();
-                break;
-            case ZombieState.Attacking:
-                AttackPlayer();
-                break;
-        }
-        
-        // Periodically play zombie sounds
-        if (Time.time > nextSoundTime)
-        {
-            PlayZombieSound();
-            // Schedule next sound
-            nextSoundTime = Time.time + Random.Range(minTimeBetweenSounds, maxTimeBetweenSounds);
+            switch (currentState)
+            {
+                case ZombieState.Emerging:
+                    HandleEmerging();
+                    break;
+                case ZombieState.Chasing:
+                    ChasePlayer();
+                    break;
+                case ZombieState.Attacking:
+                    AttackPlayer();
+                    break;
+            }
+            
+            // Periodically play zombie sounds
+            if (Time.time > nextSoundTime)
+            {
+                PlayZombieSound();
+                // Schedule next sound
+                nextSoundTime = Time.time + Random.Range(minTimeBetweenSounds, maxTimeBetweenSounds);
+            }
         }
     }
     
@@ -352,7 +504,7 @@ public class ZombieController : MonoBehaviour
                 );
             }
             
-            // NEW: Check if it's time to damage the player
+            // Check if it's time to damage the player
             if (Time.time >= nextDamageTime)
             {
                 // Check if player is in range
@@ -378,16 +530,19 @@ public class ZombieController : MonoBehaviour
     
     void ReturnToChasing()
     {
-        // After attacking, go back to chasing
-        currentState = ZombieState.Chasing;
-        
-        if (animator != null)
+        // Only return to chasing if not dying or dead
+        if (currentState != ZombieState.Dying && currentState != ZombieState.Dead)
         {
-            if (hasChaseParameter)
-                animator.SetTrigger("Chase");
-                
-            if (hasIsWalkingParameter)
-                animator.SetBool("IsWalking", true);
+            currentState = ZombieState.Chasing;
+            
+            if (animator != null)
+            {
+                if (hasChaseParameter)
+                    animator.SetTrigger("Chase");
+                    
+                if (hasIsWalkingParameter)
+                    animator.SetBool("IsWalking", true);
+            }
         }
     }
 }

@@ -1,17 +1,33 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
+using TMPro; // Add this for scene management
 
 public class PlayerDamageEffects : MonoBehaviour
 {
     public Image bloodSplatterImage;
     private CanvasGroup canvasGroup;
     public AudioClip[] hurtSounds;
+    public AudioClip deathSound; // Add a death sound
     private AudioSource audioSource;
+    
+    [Header("Health Settings")]
+    public int maxHealth = 3; // Player can take 3 hits
+    private int currentHealth;
+    public TextMeshProUGUI healthText; // Optional UI element to show health
+    
+    [Header("Game Over")]
+    public float delayBeforeGameOver = 2f; // Time before quitting/restarting
+    public GameObject gameOverPanel; // Optional Game Over UI panel
     
     void Start()
     {
         audioSource = GetComponent<AudioSource>();
+        if (audioSource == null)
+        {
+            audioSource = gameObject.AddComponent<AudioSource>();
+        }
         
         // Get the Canvas Group
         if (bloodSplatterImage != null)
@@ -29,6 +45,16 @@ public class PlayerDamageEffects : MonoBehaviour
         {
             Debug.LogError("Blood Splatter Image not assigned!");
         }
+        
+        // Initialize health
+        currentHealth = maxHealth;
+        UpdateHealthUI();
+        
+        // Hide game over panel if assigned
+        if (gameOverPanel != null)
+        {
+            gameOverPanel.SetActive(false);
+        }
     }
     
     void Update()
@@ -39,13 +65,83 @@ public class PlayerDamageEffects : MonoBehaviour
             Debug.Log("Space pressed - showing blood splatter");
             TakeDamage();
         }
+        
+        // Test instant death (for debugging)
+        if (Input.GetKeyDown(KeyCode.K))
+        {
+            currentHealth = 0;
+            PlayerDied();
+        }
     }
     
-    // Public method that can be called from zombies
+    void UpdateHealthUI()
+    {
+        if (healthText != null)
+        {
+            healthText.text = "Health: " + currentHealth + "/" + maxHealth;
+        }
+    }
+    
+    // Public method that zombies can call to damage the player
     public void TakeDamage()
     {
+        Debug.Log("Player taking damage!");
+        currentHealth--;
+        UpdateHealthUI();
+        
         ShowBloodSplatter();
         PlayHurtSound();
+        
+        // Check if player died
+        if (currentHealth <= 0)
+        {
+            PlayerDied();
+        }
+    }
+    
+    void PlayerDied()
+    {
+        Debug.Log("Player has died!");
+        
+        // Play death sound if available
+        if (deathSound != null && audioSource != null)
+        {
+            audioSource.PlayOneShot(deathSound);
+        }
+        
+        // Show game over panel if available
+        if (gameOverPanel != null)
+        {
+            gameOverPanel.SetActive(true);
+        }
+        
+        // Make blood splatter stay on screen
+        if (canvasGroup != null)
+        {
+            StopAllCoroutines();
+            canvasGroup.alpha = 1;
+        }
+        
+        // End the game after delay
+        StartCoroutine(EndGameAfterDelay());
+    }
+    
+    IEnumerator EndGameAfterDelay()
+    {
+        yield return new WaitForSeconds(delayBeforeGameOver);
+        
+        // For a build game, you'd use:
+        #if UNITY_EDITOR
+            // If in editor, just stop playing
+            UnityEditor.EditorApplication.isPlaying = false;
+        #else
+            // In a build, either quit or reload the scene
+            // Option 1: Quit the application
+            Application.Quit();
+            
+            // Option 2: Reload the current scene (comment out Option 1 if using this)
+            // SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        #endif
     }
     
     void ShowBloodSplatter()

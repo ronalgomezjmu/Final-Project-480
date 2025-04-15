@@ -8,7 +8,8 @@ public class DestroyOnCollision : MonoBehaviour
 
     void OnCollisionEnter(Collision collision)
     {
-        if (destroyWithAnyObject || collision.gameObject.CompareTag(collisionTag))
+        // Check if we should destroy this object based on collision tag
+        if (destroyWithAnyObject || (collision.gameObject.CompareTag(collisionTag) && !string.IsNullOrEmpty(collisionTag)))
         {
             // Look specifically for ZombieController 
             ZombieController zombieController = collision.gameObject.GetComponent<ZombieController>();
@@ -17,11 +18,6 @@ public class DestroyOnCollision : MonoBehaviour
             {
                 // Apply damage to the zombie
                 zombieController.TakeDamage(damageAmount);
-            }
-            else
-            {
-                // If not a zombie, destroy it directly
-                Destroy(collision.gameObject);
             }
             
             // Always destroy the bullet

@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
-using UnityEngine.UI; // Add this for UI components
+using UnityEngine.UI;
 
 public class ZombieSpawner : MonoBehaviour
 {
@@ -22,6 +22,7 @@ public class ZombieSpawner : MonoBehaviour
     private int currentWave = 0;
     private int zombiesAlive = 0;
     private List<Vector3> activeSpawnPositions = new List<Vector3>();
+    private bool waveInProgress = false;
 
     void Start()
     {
@@ -58,6 +59,7 @@ public class ZombieSpawner : MonoBehaviour
 
     IEnumerator SpawnWave()
     {
+        waveInProgress = true;
         currentWave++;
         Debug.Log("Starting Wave " + currentWave);
         
@@ -69,6 +71,7 @@ public class ZombieSpawner : MonoBehaviour
 
         // Increase difficulty with each wave
         int zombiesToSpawn = zombiesPerWave + (currentWave - 1);
+        zombiesAlive = zombiesToSpawn; // Set this before spawning to avoid race conditions
 
         if (currentWave == 1)
         {
@@ -103,10 +106,17 @@ public class ZombieSpawner : MonoBehaviour
         while (zombiesAlive > 0)
         {
             yield return new WaitForSeconds(1f);
-            // Debug.Log("Zombies still alive: " + zombiesAlive);
+            Debug.Log("Zombies still alive: " + zombiesAlive);
         }
 
         Debug.Log("Wave " + currentWave + " complete. Waiting for next wave...");
+        waveInProgress = false;
+
+        // Award wave completion bonus
+        if (ScoreManager.Instance != null)
+        {
+            ScoreManager.Instance.AddWaveCompletionBonus(currentWave);
+        }
 
         // Show the wave complete message
         StartCoroutine(ShowWaveCompleteMessage());
@@ -158,7 +168,7 @@ public class ZombieSpawner : MonoBehaviour
         // Spawn the zombie at the offset position
         GameObject zombie = Instantiate(zombiePrefab, spawnPosition, Quaternion.identity);
     
-        // Make zombie face toward the center - [existing code remains the same]
+        // Make zombie face toward the center
         Vector3 centerDirection = new Vector3(0, 0, 0) - spawnPosition;
         centerDirection.y = 0; // Keep upright
         if (centerDirection != Vector3.zero)
@@ -166,22 +176,12 @@ public class ZombieSpawner : MonoBehaviour
             zombie.transform.rotation = Quaternion.LookRotation(centerDirection);
         }
     
-        // FIRST add the component to track when zombie is destroyed
-        ZombieTracker tracker = zombie.AddComponent<ZombieTracker>();
-        tracker.spawner = this;
-        tracker.spawnPosition = spawnPosition;
-    
-        // THEN set the health and pass the tracker reference
+        // Set the health and pass the spawner reference directly
         ZombieController controller = zombie.GetComponent<ZombieController>();
         if (controller != null)
         {
             controller.SetHealth(this, currentWave);
         }
-    
-        // Increase counter
-        zombiesAlive++;
-
-        
     }
 
     // Check if a position is too close to any existing zombies
@@ -201,20 +201,21 @@ public class ZombieSpawner : MonoBehaviour
     public void ZombieDestroyed(Vector3 position)
     {
         zombiesAlive--;
+        Debug.Log("Zombie destroyed! Zombies left: " + zombiesAlive);
+        
         // Remove this position from our active positions list
         activeSpawnPositions.Remove(position);
     }
-}
-
-// Helper class to track zombie destruction - now defined properly in the same file
-public class ZombieTracker : MonoBehaviour
-{
-    public ZombieSpawner spawner;
-    public Vector3 spawnPosition;
-
-    void OnDestroy()
+    
+    // Method to check if a wave is currently in progress (for debugging)
+    public bool IsWaveInProgress()
     {
-        if (spawner != null)
-            spawner.ZombieDestroyed(spawnPosition);
+        return waveInProgress;
+    }
+    
+    // Method to get the current wave number (for scoring)
+    public int GetCurrentWave()
+    {
+        return currentWave;
     }
 }
