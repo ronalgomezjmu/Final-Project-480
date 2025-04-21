@@ -2,6 +2,7 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using System.Linq; // For FirstOrDefault
 using TMPro; // Add this for scene management
 
 public class PlayerDamageEffects : MonoBehaviour
@@ -20,6 +21,17 @@ public class PlayerDamageEffects : MonoBehaviour
     [Header("Game Over")]
     public float delayBeforeGameOver = 2f; // Time before quitting/restarting
     public GameObject gameOverPanel; // Optional Game Over UI panel
+
+    [Header("UI Elements")]
+    public Slider healthSlider;
+
+    // Add these to your existing class variables
+    [Header("Health Slider Colors")]
+    public Color healthColorFull = Color.green;       // 3/3 health - green
+    public Color healthColorMedium = Color.white;     // 2/3 health - white
+    public Color healthColorLow = Color.red;          // 1/3 or 0/3 health - red
+    private Image sliderFillImage;                    // Reference to the fill image of the slider
+    private Image sliderBackgroundImage;              // Reference to the background image of the slider
     
     void Start()
     {
@@ -49,6 +61,40 @@ public class PlayerDamageEffects : MonoBehaviour
         // Initialize health
         currentHealth = maxHealth;
         UpdateHealthUI();
+
+        if (healthSlider != null)
+        {
+            healthSlider.maxValue = maxHealth;
+            healthSlider.value = currentHealth;
+            
+            // Get the fill image from the slider
+            sliderFillImage = healthSlider.fillRect.GetComponent<Image>();
+            if (sliderFillImage == null)
+            {
+                Debug.LogError("Could not find fill image on health slider!");
+            }
+            
+            // Get the background image (the part to the right of the fill)
+            Transform backgroundRect = healthSlider.transform.Find("Background");
+            if (backgroundRect != null)
+            {
+                sliderBackgroundImage = backgroundRect.GetComponent<Image>();
+            }
+            else
+            {
+                // Try alternative method to find background
+                sliderBackgroundImage = healthSlider.GetComponentsInChildren<Image>()
+                    .FirstOrDefault(img => img.gameObject != sliderFillImage.gameObject);
+            }
+            
+            if (sliderBackgroundImage == null)
+            {
+                Debug.LogError("Could not find background image on health slider!");
+            }
+            
+            // Set initial color
+            UpdateSliderColor();
+        }
         
         // Hide game over panel if assigned
         if (gameOverPanel != null)
@@ -79,6 +125,12 @@ public class PlayerDamageEffects : MonoBehaviour
         if (healthText != null)
         {
             healthText.text = "Health: " + currentHealth + "/" + maxHealth;
+        }
+
+        if (healthSlider != null)
+        {
+            healthSlider.value = currentHealth;
+            UpdateSliderColor();
         }
     }
     
@@ -177,6 +229,40 @@ public class PlayerDamageEffects : MonoBehaviour
         {
             int randomIndex = Random.Range(0, hurtSounds.Length);
             audioSource.PlayOneShot(hurtSounds[randomIndex]);
+        }
+    }
+
+    void UpdateSliderColor()
+    {
+        if (sliderFillImage != null)
+        {
+            // Change color based on health remaining
+            if (currentHealth == maxHealth)
+            {
+                sliderFillImage.color = healthColorFull;      // Green at full health
+            }
+            else if (currentHealth == 2)
+            {
+                sliderFillImage.color = healthColorMedium;    // White at medium health
+            }
+            else
+            {
+                sliderFillImage.color = healthColorLow;       // Red at low health
+            }
+            
+            // Special case for zero health - make background red too
+            if (sliderBackgroundImage != null)
+            {
+                if (currentHealth <= 0)
+                {
+                    sliderBackgroundImage.color = healthColorLow;  // Make background red at zero health
+                }
+                else
+                {
+                    // Reset to default color when not at zero health
+                    sliderBackgroundImage.color = Color.white;     // Or whatever your default background color is
+                }
+            }
         }
     }
 }
