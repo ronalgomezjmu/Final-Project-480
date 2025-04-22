@@ -12,12 +12,12 @@ public class PlayerDamageEffects : MonoBehaviour
     public AudioClip[] hurtSounds;
     public AudioClip deathSound; // Add a death sound
     private AudioSource audioSource;
-    
+
     [Header("Health Settings")]
     public int maxHealth = 3; // Player can take 3 hits
     private int currentHealth;
     public TextMeshProUGUI healthText; // Optional UI element to show health
-    
+
     [Header("Game Over")]
     public float delayBeforeGameOver = 2f; // Time before quitting/restarting
     public GameObject gameOverPanel; // Optional Game Over UI panel
@@ -32,7 +32,7 @@ public class PlayerDamageEffects : MonoBehaviour
     public Color healthColorLow = Color.red;          // 1/3 or 0/3 health - red
     private Image sliderFillImage;                    // Reference to the fill image of the slider
     private Image sliderBackgroundImage;              // Reference to the background image of the slider
-    
+
     void Start()
     {
         audioSource = GetComponent<AudioSource>();
@@ -40,7 +40,7 @@ public class PlayerDamageEffects : MonoBehaviour
         {
             audioSource = gameObject.AddComponent<AudioSource>();
         }
-        
+
         // Get the Canvas Group
         if (bloodSplatterImage != null)
         {
@@ -57,7 +57,7 @@ public class PlayerDamageEffects : MonoBehaviour
         {
             Debug.LogError("Blood Splatter Image not assigned!");
         }
-        
+
         // Initialize health
         currentHealth = maxHealth;
         UpdateHealthUI();
@@ -66,14 +66,14 @@ public class PlayerDamageEffects : MonoBehaviour
         {
             healthSlider.maxValue = maxHealth;
             healthSlider.value = currentHealth;
-            
+
             // Get the fill image from the slider
             sliderFillImage = healthSlider.fillRect.GetComponent<Image>();
             if (sliderFillImage == null)
             {
                 Debug.LogError("Could not find fill image on health slider!");
             }
-            
+
             // Get the background image (the part to the right of the fill)
             Transform backgroundRect = healthSlider.transform.Find("Background");
             if (backgroundRect != null)
@@ -86,23 +86,23 @@ public class PlayerDamageEffects : MonoBehaviour
                 sliderBackgroundImage = healthSlider.GetComponentsInChildren<Image>()
                     .FirstOrDefault(img => img.gameObject != sliderFillImage.gameObject);
             }
-            
+
             if (sliderBackgroundImage == null)
             {
                 Debug.LogError("Could not find background image on health slider!");
             }
-            
+
             // Set initial color
             UpdateSliderColor();
         }
-        
+
         // Hide game over panel if assigned
         if (gameOverPanel != null)
         {
             gameOverPanel.SetActive(false);
         }
     }
-    
+
     void Update()
     {
         // Test with keyboard input
@@ -111,7 +111,7 @@ public class PlayerDamageEffects : MonoBehaviour
             Debug.Log("Space pressed - showing blood splatter");
             TakeDamage();
         }
-        
+
         // Test instant death (for debugging)
         if (Input.GetKeyDown(KeyCode.K))
         {
@@ -119,7 +119,7 @@ public class PlayerDamageEffects : MonoBehaviour
             PlayerDied();
         }
     }
-    
+
     void UpdateHealthUI()
     {
         if (healthText != null)
@@ -133,73 +133,80 @@ public class PlayerDamageEffects : MonoBehaviour
             UpdateSliderColor();
         }
     }
-    
+
     // Public method that zombies can call to damage the player
     public void TakeDamage()
     {
         Debug.Log("Player taking damage!");
         currentHealth--;
         UpdateHealthUI();
-        
+
         ShowBloodSplatter();
         PlayHurtSound();
-        
+
         // Check if player died
         if (currentHealth <= 0)
         {
             PlayerDied();
         }
     }
-    
+
+    public void Heal()
+    {
+        currentHealth = maxHealth;
+        UpdateHealthUI();
+        Debug.Log("Restored to full health");
+    }
+
     void PlayerDied()
     {
         Debug.Log("Player has died!");
-        
+
         // Play death sound if available
         if (deathSound != null && audioSource != null)
         {
             audioSource.PlayOneShot(deathSound);
         }
-        
+
         // Show game over panel if available
         if (gameOverPanel != null)
         {
             gameOverPanel.SetActive(true);
         }
-        
+
         // Make blood splatter stay on screen
         if (canvasGroup != null)
         {
             StopAllCoroutines();
             canvasGroup.alpha = 1;
         }
-        
+
         // End the game after delay
         StartCoroutine(EndGameAfterDelay());
     }
-    
+
     IEnumerator EndGameAfterDelay()
     {
         yield return new WaitForSeconds(delayBeforeGameOver);
-        
+
         // For a build game, you'd use:
-        #if UNITY_EDITOR
+#if UNITY_EDITOR
             // If in editor, just stop playing
             UnityEditor.EditorApplication.isPlaying = false;
-        #else
-            // In a build, either quit or reload the scene
-            // Option 1: Quit the application
-            Application.Quit();
-            
-            // Option 2: Reload the current scene (comment out Option 1 if using this)
-            // SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
-        #endif
+#else
+        // In a build, either quit or reload the scene
+        // Option 1: Quit the application
+        Application.Quit();
+
+        // Option 2: Reload the current scene (comment out Option 1 if using this)
+        // SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+#endif
     }
-    
+
     void ShowBloodSplatter()
     {
         Debug.Log("ShowBloodSplatter called. CanvasGroup is " + (canvasGroup != null ? "valid" : "NULL"));
-        
+
         if (canvasGroup != null)
         {
             StopAllCoroutines();
@@ -208,21 +215,21 @@ public class PlayerDamageEffects : MonoBehaviour
             StartCoroutine(FadeOutBloodSplatter());
         }
     }
-    
+
     IEnumerator FadeOutBloodSplatter()
     {
         yield return new WaitForSeconds(2f);
-        
+
         float fadeSpeed = 0.5f;
         while (canvasGroup.alpha > 0)
         {
             canvasGroup.alpha -= Time.deltaTime * fadeSpeed;
             yield return null;
         }
-        
+
         canvasGroup.alpha = 0;
     }
-    
+
     void PlayHurtSound()
     {
         if (audioSource != null && hurtSounds.Length > 0)
@@ -249,7 +256,7 @@ public class PlayerDamageEffects : MonoBehaviour
             {
                 sliderFillImage.color = healthColorLow;       // Red at low health
             }
-            
+
             // Special case for zero health - make background red too
             if (sliderBackgroundImage != null)
             {
