@@ -30,7 +30,7 @@ public class WalkToAttack : StateMachineBehaviour
         float distanceToPlayer = Vector3.Distance(animator.transform.position, player.position);
         
         // Update the distance parameter in the animator
-        animator.SetFloat("distance", distanceToPlayer);
+        animator.SetFloat("distanceToPlaer", distanceToPlayer);
         
         // Update destination to follow player
         agent.SetDestination(player.position);
