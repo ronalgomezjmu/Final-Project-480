@@ -17,7 +17,7 @@ public class ScoreManager : MonoBehaviour
     [SerializeField] private float pointsPopupDuration = 2f;
     [SerializeField] private Color pointsPopupColor = Color.yellow;
 
-    private int currentScore = 0;
+    private int currentScore = 100;
     private Coroutine pointsPopupCoroutine;
 
     // Define events for score changes
