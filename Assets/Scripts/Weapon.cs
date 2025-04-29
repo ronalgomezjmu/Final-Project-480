@@ -18,6 +18,7 @@ public class Weapon : MonoBehaviour
     private float reloadCooldownRemaining = 0;
 
     public bool isAutomatic = false;
+    public bool isShotgun = false;
     private bool isShooting = false;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -81,9 +82,14 @@ public class Weapon : MonoBehaviour
     {
         if (currentAmmoCount > 0 && shotCooldownRemaining <= 0)
         {
-            GameObject bullet = Instantiate(bulletTamplate, firePoint.position, firePoint.rotation);
-            Rigidbody rigidbody = bullet.GetComponent<Rigidbody>();
-            rigidbody.AddForce(firePoint.up * 5000f);
+            int numberOfBullets = isShotgun ? 4 : 1;
+            for (int i = 0; i < numberOfBullets; i++)
+            {
+                GameObject bullet = Instantiate(bulletTamplate, firePoint.position, firePoint.rotation);
+                Rigidbody rigidbody = bullet.GetComponent<Rigidbody>();
+                rigidbody.AddForce(firePoint.up * 5000f);
+            }
+
             shotCooldownRemaining = timeBetweenShots;
             currentAmmoCount -= 1;
 

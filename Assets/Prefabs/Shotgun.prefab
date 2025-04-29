@@ -221,18 +221,18 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3746578571352501742}
-  m_LocalRotation: {x: -0, y: -0.7071068, z: -0, w: -0.7071068}
-  m_LocalPosition: {x: 0, y: 0, z: -0.07}
+  m_LocalRotation: {x: 0, y: -0.7071068, z: 0, w: 0.7071068}
+  m_LocalPosition: {x: 0, y: 0, z: -0.070092976}
   m_LocalScale: {x: 0.006099998, y: 0.0075999997, z: 10}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2808385139827405603}
   - {fileID: 5716068865940413712}
   m_Father: {fileID: 3328337170462680692}
-  m_LocalEulerAnglesHint: {x: 180, y: 90, z: 90}
+  m_LocalEulerAnglesHint: {x: 180, y: 90, z: 180}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: -2.37, y: 2.52}
+  m_AnchoredPosition: {x: -2.3700354, y: 1.96}
   m_SizeDelta: {x: 1628, y: 899}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!223 &2430213023972929818
@@ -949,6 +949,7 @@ MonoBehaviour:
   reloadProgress: {fileID: 6342408638747529436}
   reloadTime: 2
   isAutomatic: 0
+  isShotgun: 1
 --- !u!4 &3328337170462680692 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: ab6545d97c47a06089aa35e6a8a6df81, type: 3}

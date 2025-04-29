@@ -3827,13 +3827,17 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1859413242294177448, guid: 8a82a35b7951b88bfb4eebc710eadf2b, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2700877372883238094, guid: 8a82a35b7951b88bfb4eebc710eadf2b, type: 3}
       propertyPath: m_Name
       value: Shotgun
       objectReference: {fileID: 0}
     - target: {fileID: 3328337170462680692, guid: 8a82a35b7951b88bfb4eebc710eadf2b, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 2.722
+      value: 4.828
       objectReference: {fileID: 0}
     - target: {fileID: 3328337170462680692, guid: 8a82a35b7951b88bfb4eebc710eadf2b, type: 3}
       propertyPath: m_LocalPosition.y
