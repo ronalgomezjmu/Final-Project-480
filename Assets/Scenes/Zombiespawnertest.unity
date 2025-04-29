@@ -211,6 +211,17 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: -2962528451945521306, guid: e533539dd8d528b4fb61fd8f55e4ccf0, type: 3}
+--- !u!114 &67446548 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 6760130182699928509, guid: 0d4318c54b6f45a2e8b8c887b2e15739, type: 3}
+  m_PrefabInstance: {fileID: 909404467}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 358be727f1b2e9bc6ac5af4cc919799e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &131794122
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1821,6 +1832,103 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 135467755441962227, guid: faece97b0b2e1404b8e6fddec8f26d3f, type: 3}
+--- !u!1001 &909404467
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 1399352648993775031, guid: 0d4318c54b6f45a2e8b8c887b2e15739, type: 3}
+      propertyPath: m_Deactivated.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1399352648993775031, guid: 0d4318c54b6f45a2e8b8c887b2e15739, type: 3}
+      propertyPath: m_Deactivated.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1399352648993775031, guid: 0d4318c54b6f45a2e8b8c887b2e15739, type: 3}
+      propertyPath: m_Deactivated.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 67446548}
+    - target: {fileID: 1399352648993775031, guid: 0d4318c54b6f45a2e8b8c887b2e15739, type: 3}
+      propertyPath: m_Deactivated.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1399352648993775031, guid: 0d4318c54b6f45a2e8b8c887b2e15739, type: 3}
+      propertyPath: m_Deactivated.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: stopShooting
+      objectReference: {fileID: 0}
+    - target: {fileID: 1399352648993775031, guid: 0d4318c54b6f45a2e8b8c887b2e15739, type: 3}
+      propertyPath: m_Deactivated.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: Weapon, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 1399352648993775031, guid: 0d4318c54b6f45a2e8b8c887b2e15739, type: 3}
+      propertyPath: m_Deactivated.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
+    - target: {fileID: 6760130182699928509, guid: 0d4318c54b6f45a2e8b8c887b2e15739, type: 3}
+      propertyPath: ammoCount
+      value: 1000
+      objectReference: {fileID: 0}
+    - target: {fileID: 6760130182699928509, guid: 0d4318c54b6f45a2e8b8c887b2e15739, type: 3}
+      propertyPath: isAutomatic
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6760130182699928509, guid: 0d4318c54b6f45a2e8b8c887b2e15739, type: 3}
+      propertyPath: timeBetweenShots
+      value: 0.05
+      objectReference: {fileID: 0}
+    - target: {fileID: 8091819283307340373, guid: 0d4318c54b6f45a2e8b8c887b2e15739, type: 3}
+      propertyPath: m_Name
+      value: Pistol
+      objectReference: {fileID: 0}
+    - target: {fileID: 8863148287339854063, guid: 0d4318c54b6f45a2e8b8c887b2e15739, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 477.75723
+      objectReference: {fileID: 0}
+    - target: {fileID: 8863148287339854063, guid: 0d4318c54b6f45a2e8b8c887b2e15739, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.909
+      objectReference: {fileID: 0}
+    - target: {fileID: 8863148287339854063, guid: 0d4318c54b6f45a2e8b8c887b2e15739, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 471.2799
+      objectReference: {fileID: 0}
+    - target: {fileID: 8863148287339854063, guid: 0d4318c54b6f45a2e8b8c887b2e15739, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: -0.0017044451
+      objectReference: {fileID: 0}
+    - target: {fileID: 8863148287339854063, guid: 0d4318c54b6f45a2e8b8c887b2e15739, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0.0017039275
+      objectReference: {fileID: 0}
+    - target: {fileID: 8863148287339854063, guid: 0d4318c54b6f45a2e8b8c887b2e15739, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0.70698136
+      objectReference: {fileID: 0}
+    - target: {fileID: 8863148287339854063, guid: 0d4318c54b6f45a2e8b8c887b2e15739, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0.7072281
+      objectReference: {fileID: 0}
+    - target: {fileID: 8863148287339854063, guid: 0d4318c54b6f45a2e8b8c887b2e15739, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: -90
+      objectReference: {fileID: 0}
+    - target: {fileID: 8863148287339854063, guid: 0d4318c54b6f45a2e8b8c887b2e15739, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8863148287339854063, guid: 0d4318c54b6f45a2e8b8c887b2e15739, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: -180.276
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 0d4318c54b6f45a2e8b8c887b2e15739, type: 3}
 --- !u!1 &912520546
 GameObject:
   m_ObjectHideFlags: 0
@@ -2392,7 +2500,7 @@ MeshCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 5
-  m_Convex: 0
+  m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 7581153581483696995, guid: 79f3e412f886f274d9b89e9e3f1b7883, type: 3}
 --- !u!1001 &1139128698
@@ -8697,3 +8805,4 @@ SceneRoots:
   - {fileID: 918874383}
   - {fileID: 912520548}
   - {fileID: 1321908775}
+  - {fileID: 909404467}
