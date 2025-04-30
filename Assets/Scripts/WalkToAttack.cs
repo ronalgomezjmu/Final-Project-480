@@ -33,12 +33,12 @@ public class WalkToAttack : StateMachineBehaviour
         animator.SetFloat("distanceToPlaer", distanceToPlayer);
         
         // Update destination to follow player
-        agent.SetDestination(player.position);
-        
-        // Debug distance in console (optional)
-        if (Input.GetKeyDown(KeyCode.D))
+        // Only move if on NavMesh
+        if (agent.isOnNavMesh)
         {
-            Debug.Log("Distance to player: " + distanceToPlayer);
+            agent.SetDestination(player.position);
         }
+
+        
     }
 }

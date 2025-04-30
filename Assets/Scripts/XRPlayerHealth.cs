@@ -1,33 +1,31 @@
 using UnityEngine;
-using UnityEngine.Events;
+using UnityEngine.SceneManagement;
 
 public class XRPlayerHealth : MonoBehaviour
 {
-    public int maxHealth = 100;
-    public int currentHealth;
-    
-    public UnityEvent onDamage;
-    public UnityEvent onDeath;
-    
+    public int maxHealth = 3;
+    private int currentHealth;
+
     void Start()
     {
         currentHealth = maxHealth;
     }
-    
+
     public void TakeDamage(int amount)
     {
         currentHealth -= amount;
-        
-        if (onDamage != null)
-            onDamage.Invoke();
-            
+        Debug.Log("Player hit! Current Health: " + currentHealth);
+
         if (currentHealth <= 0)
         {
-            if (onDeath != null)
-                onDeath.Invoke();
-                
-            // Handle player death
-            Debug.Log("Player died");
+            Debug.Log("Player died!");
+            ReturnToStartScene();
         }
+    }
+
+    void ReturnToStartScene()
+    {
+        // Replace "StartScene" with your actual scene name
+        SceneManager.LoadScene("Zombiespawnertest");
     }
 }
