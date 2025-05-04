@@ -157,27 +157,30 @@ public class PlayerDamageEffects : MonoBehaviour
     void PlayerDied()
     {
         Debug.Log("Player has died!");
-
+    
         if (deathSound != null)
             audioSource.PlayOneShot(deathSound);
-
+    
         if (gameOverPanel != null)
             gameOverPanel.SetActive(true);
-
+    
         if (canvasGroup != null)
         {
             StopAllCoroutines();
             canvasGroup.alpha = 1;
         }
-
-        StartCoroutine(EndGameAfterDelay());
+    
+        // Optional: Freeze gameplay (disable this to allow transition)
+        // Time.timeScale = 0f;
+    
+        // Start coroutine to load MenuScene after delay
+        StartCoroutine(LoadMenuSceneAfterDelay());
     }
-
-    IEnumerator EndGameAfterDelay()
+    
+    IEnumerator LoadMenuSceneAfterDelay()
     {
-        yield return new WaitForSeconds(delayBeforeGameOver);
-
-        // Reload scene (recommended for VR projects)
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        yield return new WaitForSeconds(delayBeforeGameOver); // use your delay value
+        SceneManager.LoadScene("MenuScene"); // make sure this matches the scene name
     }
+    
 }
