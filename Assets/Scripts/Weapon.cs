@@ -12,6 +12,9 @@ public class Weapon : MonoBehaviour
     public float timeBetweenShots = 1f;
     private float shotCooldownRemaining = 0;
 
+    public AudioSource audioSource;
+    public AudioClip shootSound;
+
     public GameObject reloadingText;
     public Slider reloadProgress;
     public float reloadTime = 2f;
@@ -20,10 +23,17 @@ public class Weapon : MonoBehaviour
     public bool isAutomatic = false;
     public bool isShotgun = false;
     private bool isShooting = false;
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    
+    // Start is called before the first frame update
     void Start()
     {
         currentAmmoCount = ammoCount;
+        
+        // If audio source is not assigned, try to get it from this object
+        if (audioSource == null)
+        {
+            audioSource = GetComponent<AudioSource>();
+        }
     }
 
     void Update()
@@ -82,6 +92,12 @@ public class Weapon : MonoBehaviour
     {
         if (currentAmmoCount > 0 && shotCooldownRemaining <= 0)
         {
+            // Play the shooting sound
+            if (audioSource != null && shootSound != null)
+            {
+                audioSource.PlayOneShot(shootSound);
+            }
+            
             int numberOfBullets = isShotgun ? 4 : 1;
             for (int i = 0; i < numberOfBullets; i++)
             {
