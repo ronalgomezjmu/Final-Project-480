@@ -15,6 +15,7 @@ public class ZombieController : MonoBehaviour
     private bool isAttacking = false;
 
     public AudioClip deathClip;
+    private ZombieHealth zombieHealth; // Reference to health component
 
     private static readonly int Walk = Animator.StringToHash("rootZombie_Walk");
     private static readonly int Attack = Animator.StringToHash("rootZombie_Attack");
@@ -23,6 +24,7 @@ public class ZombieController : MonoBehaviour
     {
         agent = GetComponent<NavMeshAgent>();
         animator = GetComponent<Animator>();
+        zombieHealth = GetComponent<ZombieHealth>(); // Get the health component
 
         // Find the player
         GameObject playerObject = GameObject.Find("XR Origin (XR Rig)");
@@ -103,11 +105,23 @@ public class ZombieController : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Bullet"))
         {
+            Debug.Log("Bullet hit zombie - Taking damage");
+            
+            // Add points
             if (ScoreManager.Instance != null)
             {
                 ScoreManager.Instance.AddPoints(10);
             }
 
+            // IMPORTANT: Call TakeDamage instead of handling death directly
+            if (zombieHealth != null)
+            {
+                zombieHealth.TakeDamage(1);
+            }
+            
+            // Remove the direct death handling - let ZombieHealth handle it
+            // Comment out or remove these lines:
+            /*
             // Trigger death animation
             if (animator != null)
             {
@@ -118,16 +132,9 @@ public class ZombieController : MonoBehaviour
             agent.enabled = false;
             isAttacking = true;
 
-            // Optionally play a death sound
-            AudioSource audio = GetComponent<AudioSource>();
-            if (audio != null && deathClip != null)
-            {
-                audio.PlayOneShot(deathClip);
-            }
-
-            // Delay destruction so the animation can play
+            // Destroy the object
             Destroy(gameObject, 3f);
+            */
         }
     }
-
-    }
+}
