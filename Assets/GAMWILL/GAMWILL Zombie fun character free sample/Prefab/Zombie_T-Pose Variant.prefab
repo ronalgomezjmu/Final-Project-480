@@ -9,6 +9,18 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 2739436006716708373, guid: 47fdb639051a1404fbe16b49cfc001aa, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 2739436006716708373, guid: 47fdb639051a1404fbe16b49cfc001aa, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 2739436006716708373, guid: 47fdb639051a1404fbe16b49cfc001aa, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 2739436006716708373, guid: 47fdb639051a1404fbe16b49cfc001aa, type: 3}
       propertyPath: m_LocalPosition.x
       value: 490.35
       objectReference: {fileID: 0}
@@ -95,6 +107,8 @@ MonoBehaviour:
   detectionRange: 10
   attackCooldown: 0
   deathClip: {fileID: 8300000, guid: 497d02c2288db3842a931cb0bf956dba, type: 3}
+  walkingClip: {fileID: 8300000, guid: 295e82b8f30ac6c46a4b9ef9e193ba03, type: 3}
+  walkingSoundVolume: 0.5
 --- !u!136 &7618132887524549533
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -128,8 +142,8 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 0}
-  m_Resource: {fileID: 0}
+  m_audioClip: {fileID: 8300000, guid: faf693567d8ef444e8e3defa042629a7, type: 3}
+  m_Resource: {fileID: 8300000, guid: faf693567d8ef444e8e3defa042629a7, type: 3}
   m_PlayOnAwake: 1
   m_Volume: 1
   m_Pitch: 1

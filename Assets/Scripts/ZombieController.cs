@@ -15,6 +15,9 @@ public class ZombieController : MonoBehaviour
     private bool isAttacking = false;
 
     public AudioClip deathClip;
+    public AudioClip walkingClip; // Add walking sound clip
+    public float walkingSoundVolume = 0.5f; // Volume control for walking sound
+    private AudioSource audioSource; // Audio source component
     private ZombieHealth zombieHealth; // Reference to health component
 
     private static readonly int Walk = Animator.StringToHash("rootZombie_Walk");
@@ -25,6 +28,7 @@ public class ZombieController : MonoBehaviour
         agent = GetComponent<NavMeshAgent>();
         animator = GetComponent<Animator>();
         zombieHealth = GetComponent<ZombieHealth>(); // Get the health component
+        audioSource = GetComponent<AudioSource>(); // Get the audio source component
 
         // Find the player
         GameObject playerObject = GameObject.Find("XR Origin (XR Rig)");
@@ -43,6 +47,16 @@ public class ZombieController : MonoBehaviour
             animator.Play(Walk);
         }
 
+        // Start playing walking sound (looped)
+        if (audioSource != null && walkingClip != null)
+        {
+            audioSource.clip = walkingClip;
+            audioSource.loop = true;
+            audioSource.volume = walkingSoundVolume;
+            audioSource.spatialBlend = 1.0f; // 3D sound
+            audioSource.Play();
+        }
+
         Debug.Log("Zombie initialized and set to walking state");
     }
 
@@ -57,6 +71,17 @@ public class ZombieController : MonoBehaviour
         if (agent.isOnNavMesh)
         {
             agent.SetDestination(player.position);
+
+            // Play walking sound if moving
+            if (agent.velocity.magnitude > 0.1f && !audioSource.isPlaying)
+            {
+                audioSource.Play();
+            }
+            // Pause walking sound if stopped
+            else if (agent.velocity.magnitude <= 0.1f && audioSource.isPlaying)
+            {
+                audioSource.Pause();
+            }
         }
 
         // Attack if close enough and cooldown expired
@@ -70,6 +95,12 @@ public class ZombieController : MonoBehaviour
     {
         agent.isStopped = true;
         isAttacking = true;
+
+        // Pause walking sound during attack
+        if (audioSource.isPlaying)
+        {
+            audioSource.Pause();
+        }
 
         FaceTarget();
         animator.Play(Attack);
@@ -89,6 +120,12 @@ public class ZombieController : MonoBehaviour
         agent.isStopped = false;
         isAttacking = false;
 
+        // Resume walking sound
+        if (!audioSource.isPlaying)
+        {
+            audioSource.Play();
+        }
+
         Debug.Log("Attack finished, resuming walking");
     }
 
@@ -106,7 +143,7 @@ public class ZombieController : MonoBehaviour
         if (collision.gameObject.CompareTag("Bullet"))
         {
             Debug.Log("Bullet hit zombie - Taking damage");
-            
+
             // Add points
             if (ScoreManager.Instance != null)
             {
@@ -118,7 +155,7 @@ public class ZombieController : MonoBehaviour
             {
                 zombieHealth.TakeDamage(1);
             }
-            
+
             // Remove the direct death handling - let ZombieHealth handle it
             // Comment out or remove these lines:
             /*
