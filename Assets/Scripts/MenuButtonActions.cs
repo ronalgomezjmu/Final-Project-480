@@ -12,4 +12,13 @@ public class MenuButtonActions : MonoBehaviour
     {
         SceneManager.LoadScene("Zombiespawnertest");
     }
+
+    public void CloseGame()
+    {
+        #if UNITY_EDITOR
+            UnityEditor.EditorApplication.isPlaying = false;
+        #else
+            Application.Quit();
+        #endif
+    }
 }
