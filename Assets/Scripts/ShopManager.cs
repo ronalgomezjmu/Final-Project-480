@@ -3,9 +3,6 @@ using UnityEngine.UI;
 
 public class ShopManager : MonoBehaviour
 {
-    // Reference to the player's points system
-    public int playerPoints;
-    
     // Gun prefabs
     public GameObject smgPrefab;
     public GameObject healItemPrefab;
@@ -55,24 +52,20 @@ public class ShopManager : MonoBehaviour
     
     void UpdateButtonState()
     {
-        // Update button interactability based on points
+        int currentPoints = ScoreManager.Instance != null ? ScoreManager.Instance.GetScore() : 0;
         if (smgButton != null)
-            smgButton.interactable = playerPoints >= smgPrice;
-            
+            smgButton.interactable = currentPoints >= smgPrice;
         if (healButton != null)
-            healButton.interactable = playerPoints >= healPrice;
+            healButton.interactable = currentPoints >= healPrice;
     }
     
     public void BuySMG()
     {
-        Debug.Log("BuySMG method called. Current points: " + playerPoints + ", SMG price: " + smgPrice);
-        
-        if (playerPoints >= smgPrice)
+        int currentPoints = ScoreManager.Instance != null ? ScoreManager.Instance.GetScore() : 0;
+        Debug.Log("BuySMG method called. Current points: " + currentPoints + ", SMG price: " + smgPrice);
+        if (currentPoints >= smgPrice)
         {
-            // Deduct points
-            playerPoints -= smgPrice;
-            
-            // Spawn the gun at the designated spawn point
+            ScoreManager.Instance.AddPoints(-smgPrice);
             if (gunSpawnPoint != null && smgPrefab != null)
             {
                 Instantiate(smgPrefab, gunSpawnPoint.position, gunSpawnPoint.rotation);
@@ -82,8 +75,6 @@ public class ShopManager : MonoBehaviour
             {
                 Debug.LogError("Missing gunSpawnPoint or smgPrefab reference!");
             }
-            
-            // Update button state after purchase
             UpdateButtonState();
         }
         else
@@ -94,14 +85,11 @@ public class ShopManager : MonoBehaviour
     
     public void BuyHeal()
     {
-        Debug.Log("BuyHeal method called. Current points: " + playerPoints + ", Heal price: " + healPrice);
-        
-        if (playerPoints >= healPrice)
+        int currentPoints = ScoreManager.Instance != null ? ScoreManager.Instance.GetScore() : 0;
+        Debug.Log("BuyHeal method called. Current points: " + currentPoints + ", Heal price: " + healPrice);
+        if (currentPoints >= healPrice)
         {
-            // Deduct points
-            playerPoints -= healPrice;
-            
-            // Spawn the heal item at the designated spawn point
+            ScoreManager.Instance.AddPoints(-healPrice);
             if (gunSpawnPoint != null && healItemPrefab != null)
             {
                 Instantiate(healItemPrefab, gunSpawnPoint.position, gunSpawnPoint.rotation);
@@ -111,8 +99,6 @@ public class ShopManager : MonoBehaviour
             {
                 Debug.LogError("Missing gunSpawnPoint or healItemPrefab reference!");
             }
-            
-            // Update button state after purchase
             UpdateButtonState();
         }
         else

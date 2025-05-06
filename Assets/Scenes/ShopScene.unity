@@ -1511,7 +1511,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   score: 0
-  scoreToUnlock: 100
   scoreText: {fileID: 0}
 --- !u!4 &503252196
 Transform:
